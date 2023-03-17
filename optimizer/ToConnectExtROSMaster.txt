@@ -1,0 +1,10 @@
+on terminal:
+1) export ROS_MASTER_URI=http://172.22.41.222:11311
+2) export ROS_IP=172.22.41.222
+3) roscore
+
+on matlab command window:
+1) rosinit('172.22.41.222')
+
+
+should be on the same network now.
