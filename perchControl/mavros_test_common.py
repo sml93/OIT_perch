@@ -4,7 +4,7 @@ from __future__ import division
 import unittest
 import rospy
 import math
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, Twist
 from mavros_msgs.msg import Altitude, ExtendedState, HomePosition, ParamValue, State, \
                             WaypointList, AttitudeTarget
 from mavros_msgs.srv import CommandBool, ParamGet, ParamSet, SetMode, SetModeRequest, WaypointClear, \
@@ -33,6 +33,7 @@ class MavrosTestCommon(unittest.TestCase):
         self.desired_position = PoseStamped()
         self.desired_atti = AttitudeTarget()
         self.desired_atti_y = Float64()
+        self.local_atti = AttitudeTarget()
 
         self.sub_topics_ready = {
             key: False
@@ -97,6 +98,12 @@ class MavrosTestCommon(unittest.TestCase):
 
         self.desired_atti_y_sub = rospy.Subscriber('desired_atti_y', Float64,
                                                 self.desired_atti_y_callback)
+        
+        self.local_vel_sub = rospy.Subscriber('mavros/local_position/twist', Twist,
+                                              self.local_velocity_callback)
+        
+        self.local_thrust_sub = rospy.Subscriber('/mavros/setpoint_raw/target_attitude', AttitudeTarget,
+                                                 self.local_thrust_callback)
 
     def tearDown(self):
         self.log_topic_vars()
@@ -199,6 +206,13 @@ class MavrosTestCommon(unittest.TestCase):
 
     def desired_atti_y_callback(self, data):
         self.desired_atti_y = data
+
+    def local_velocity_callback(self, data):
+        self.local_velocity = data
+
+    def local_thrust_callback(self, data):
+        self.local_atti = data
+
 
 
     #

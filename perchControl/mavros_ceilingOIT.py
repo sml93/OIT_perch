@@ -22,7 +22,7 @@ from sensor_msgs.msg import LaserScan
 from mavros_test_common import MavrosTestCommon
 from tf.transformations import quaternion_from_euler
 from mavros_msgs.msg import ParamValue, AttitudeTarget
-from geometry_msgs.msg import Quaternion, Vector3, PoseStamped 
+from geometry_msgs.msg import Quaternion, Vector3, PoseStamped, Twist
 # from transforms3d.euler import euler2quat as quaternion_from_euler
 # from transforms3d.euler import quat2euler as quaternion_to_euler
 
@@ -38,7 +38,7 @@ class MavrosOffboardUAVctl(MavrosTestCommon):
 		super(MavrosOffboardUAVctl, self).setUp()
 		self.xp = 0.0
 		self.yp = 0.0
-		self.zp = 1.0
+		self.zp = 1.5
 
 		self.x = 0
 		self.y = 0
@@ -208,10 +208,27 @@ class MavrosOffboardUAVctl(MavrosTestCommon):
 		thrustControl = flc.flc()
 		self.desired_atti.thrust = round(thrustControl.update(), 4)
 
+		# thrustSP_list = []
+		# time_list = []
+		# poseZ = []
+		# velZ = []
+		# ce_list = []
+		# cd_list = []
+		# time_start = time.time()
+
 		while not rospy.is_shutdown():
 			if (not self.mission_done.data):
+				# ## For plotting
+				# # thrustSP_list.append(self.initPerch_atti.thrust)
+				# thrustSP_list.append(self.local_atti.thrust)
+				# time_list.append(time.time()-time_start)
+				# poseZ.append(thrustControl.zuav)
+				# velZ.append(thrustControl._vel_uav)
+				# ce_list.append(thrustControl.thrustCE*9.81)
+				# cd_list.append(thrustControl._ceiling_dist)
+
 				self.reach_position(0,0,20)
-				if (np.linalg.norm(self.desired_position.pose.position.x-self.local_position.pose.position.x)<=0.05) and (np.linalg.norm(self.desired_position.pose.position.z-self.local_position.pose.position.z)<=0.03):
+				if (np.linalg.norm(self.desired_position.pose.position.x-self.local_position.pose.position.x)<=0.03) and (np.linalg.norm(self.desired_position.pose.position.z-self.local_position.pose.position.z)<=0.03):
 					# Send setpoints in separate thread to prevent failsafe
 					time.sleep(3)
 					rospy.loginfo("thrust val: %f", self.initPerch_atti.thrust)
@@ -227,12 +244,30 @@ class MavrosOffboardUAVctl(MavrosTestCommon):
 								self.initPerch_atti.orientation.z = self.desired_atti.orientation.z
 								self.initPerch_atti.thrust = self.desired_atti.thrust
 								self.resend_att()
+
+								# ## For plotting
+								# thrustSP_list.append(self.initPerch_atti.thrust)
+								# time_list.append(time.time()-time_start)
+								# poseZ.append(thrustControl.zuav)
+								# velZ.append(thrustControl._vel_uav)
+								# ce_list.append(thrustControl.thrustCE*9.81)
+								# cd_list.append(thrustControl._ceiling_dist)
+
 							else:
 								self.initPerch_atti.orientation.x = self.x
 								self.initPerch_atti.orientation.y = self.y
 								self.initPerch_atti.orientation.z = self.z
 								self.initPerch_atti.thrust = round(thrustControl.update(),4)
 								self.resend_att()
+
+								# ## For plotting
+								# thrustSP_list.append(self.initPerch_atti.thrust)
+								# time_list.append(time.time()-time_start)
+								# poseZ.append(thrustControl.zuav)
+								# velZ.append(thrustControl._vel_uav)
+								# ce_list.append(thrustControl.thrustCE*9.81)
+								# cd_list.append(thrustControl._ceiling_dist)
+
 								# rospy.loginfo("resend_atti \n")
 						else: break
 			else:
@@ -249,6 +284,20 @@ class MavrosOffboardUAVctl(MavrosTestCommon):
 		self.set_mode("AUTO.LAND", 5)
 		self.wait_for_landed_state(mavutil.mavlink.MAV_LANDED_STATE_ON_GROUND, 90, 0)
 		self.set_arm(False, 5)
+		
+		# plt.figure()
+		# plt.plot(time_list, thrustSP_list, label="thrustSP")
+		# plt.plot(time_list, poseZ, label="poseZ (m)")
+		# plt.plot(time_list, velZ, label="velZ (m/s)")
+		# plt.plot(time_list, ce_list, label="thrust_ce (N)")
+		# plt.plot(time_list, cd_list, label="ceiling_dist (m)")
+		# plt.legend(loc='upper left')
+
+		# plt.figure()
+		# plt.plot(time_list, thrustSP_list, label="thrustSP")
+		
+		# plt.legend(loc='upper left')
+		# plt.show()
 
 
 if __name__ == "__main__":
