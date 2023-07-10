@@ -11,7 +11,8 @@ Install ROS-desktop-full-> Visit ROSwiki for documentation:
 - ensure to setup catkin_ws too
 
 
-Install matlab for Linux
+Install matlab for Linux:
+Files to execute matlab operations can be found in ~/OIT_perch/optimizer/
 
 
 Installing mavros:
