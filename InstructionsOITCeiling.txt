@@ -11,8 +11,7 @@ Install ROS-desktop-full-> Visit ROSwiki for documentation:
 - ensure to setup catkin_ws too
 
 
-Install matlab for Linux:
-Files to execute matlab operations can be found in ~/OIT_perch/optimizer/
+Install matlab for Linux
 
 
 Installing mavros:
@@ -29,6 +28,7 @@ git config --global --unset https.proxy (if cannot install some packages from gi
 
 Installing gz_ros_plugin:
 fork and git clone https://github.com/sml93/gz_ros_plugin.git into ~/catkin_ws/src
+git checkout -branch fourth  ## this contains the plugin with ceiling effect.
 catkin build
 source catkin_ws/devel/setup.bash
 
@@ -54,7 +54,7 @@ EXECUTE SIMULATION:
 2) roslaunch px4 posix_sitl_OIT.launch
 3) roslaunch mavros px4.launch fcu_url:="udp://:14540@172.22.41.222"
 4) cd ~/OIT_perch/perchControl/ and run python mavrosAttCtrl_OIT.py
-5) python3 mavros_ceilingOIT.py
+5) python3 flcTC.py
 6) rosrun oit_dyn_rec server.py
 7) rosrun rqt_reconfigure rqt_reconfigure, select the oit_topic to change the orientation and jetforce at will. Safety switch via mission_status: boolean type. Make sure this is False before next flight. 
 
